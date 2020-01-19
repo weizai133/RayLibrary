@@ -25,7 +25,22 @@ const query = (sql, options, callback) =>{
 	})
 }
 
+const asyQuery = (sql, options) => {
+	return new Promise((resolve, reject)=>{
+		pool.getConnection((err, conn) => {
+			if(err) reject(err);
+			else {
+				conn.query(sql, options, (err, result, fields)=>{
+					if(err) return reject(err);
+					resolve(result);
+				})
+			}
+		})
+	})
+}
+
 module.exports = {
 	query,
-	pool
+	pool,
+	asyQuery
 }

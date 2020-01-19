@@ -19,7 +19,7 @@ const updateBook = (bookId, data) => {
 	return new Promise((resolve, reject)=>{
 		let sqlQuery = 'UPDATE book SET ? ';
 		sqlQuery += ` WHERE bookId = ${bookId}`;
-		db.query(sqlQuery, [data, bookId], function(err, rows){
+		db.query(sqlQuery, [data], function(err, rows){
 			if(err) reject({status : 500, message: 'systemError'})
 			else if(rows) resolve({status:200, data: {bookId,data}})
 		})
@@ -42,22 +42,51 @@ const createBorrowOrder = (userId, bookId, from, to) =>{
 		let duration = getDaysBetweenRange(from, to);
 		db.query(sqlquery, {bookId, userId, from, to,duration }, function(err, rows){
 			if(err) reject({status : 500, message: 'systemError'});
-			else if (rows) resolve({status : 200, data : {borrow_id : rows.insertId}});
+			else if (rows) resolve({status : 200, data : {borrowId : rows.insertId}});
+		})
+	})
+}
+
+const updateBorrowOrder = (borrowId, data) => {
+	return new Promise((resolve, reject)=>{
+		let sqlQuery = `UPDATE borrow_order SET ? `;
+		sqlQuery += `WHERE borrowId = ${borrowId}`;
+		db.query(sqlQuery, [data], function(err, rows){
+			if(err) reject({status : 500, message : 'systemError'});
+			else if(rows) {
+				resolve({status : 200, data: {borrowId, data} });
+			}
 		})
 	})
 }
 
 const getAllBorrowOrderByUserId = (userId) => {
 	return new Promise((resolve, reject)=>{
-		let sqlQuery = `SELECT borrowId, book.bookId, bookName, userName, borrow_order.from, borrow_order.to, duration, sold, hasReturn FROM `;
+		let sqlQuery = `SELECT borrowId, book.bookId, bookName, userName, borrow_order.from, borrow_order.to, duration, sold, hasReturn, fine FROM `;
 		sqlQuery += '((borrow_order INNER JOIN user on user.userId = borrow_order.userId AND user.userId = ? ) INNER JOIN book on book.bookId = borrow_order.bookId)';
 
 		db.query(sqlQuery, [userId], function(err, rows){
 			if(err) reject({status : 500, message: 'systemError'});
 			else if(rows && rows.length>0) {
-				const expiredBorrow = rows.filter(val => moment(val.to).isBefore(moment()));
-				console.log(expiredBorrow);
-				resolve({status : 200, data : rows})
+				if(rows.find(val => val['hasReturn'] === 0 && moment(val.to).isBefore(moment()))){
+					 rows = rows.map(val=> (
+						moment(val.to).isBefore(moment()) ? 
+						{
+							...val,
+							fine : 5 * getDaysBetweenRange(val['to'], moment())
+						} : {...val}
+					));
+
+					Promise.all(rows.filter(val=> val.fine && val.fine>0).map((val)=> {
+						return	updateBorrowOrder(val.borrowId, {fine : val['fine']});
+					}))
+					.then(res=>{
+						resolve({status : 200, data : rows})
+					})
+					.catch(err=> reject({status : 500, message : 'systemError'}))
+				}else{
+					resolve({status : 200, data : rows})
+				}
 			}
 		})
 	})
@@ -88,7 +117,9 @@ const purchase = (bookId, orderId) => {
 		let sqlQuery = `UPDATE book SET orderId = ?, sold = 1 WHERE bookId = ?`;
 		db.query(sqlQuery, [orderId, bookId], function(err, rows){
 			if(err) reject({status: 500, message: 'systemError'});
-			else if(rows) resolve({status : 200, data : {bookId, orderId}})
+			else if(rows) {
+				resolve({status : 200, data : {bookId, orderId}})
+			}
 		})
 	})
 }
@@ -101,10 +132,13 @@ const purchaseBooks = (items, userId) =>{
 			if(err) reject({status:500, message: err});
 			else if(rows) {
 				logger.info('Purchasing book')
-				Promise.all(JSON.parse(items).map(val=>{
-					purchase(val, rows['insertId']);
-				}))
-				.then(res=>resolve({status : 200, data : {orderId : rows['insertId'], items, userId} }))
+				Promise.all(JSON.parse(items).map(val=>
+					 purchase(val, rows['insertId'])
+				))
+				.then(res=>{
+					resolve({status : 200, data : {orderId : rows['insertId'], items, userId} })
+				
+				})
 				.catch(err=>reject(err));
 			}
 		})
@@ -135,7 +169,6 @@ const checkBookAvaililty = (books) =>{
 	}
 }
 
-
 module.exports = {
 	createBook,
 	getBooks,
@@ -146,3 +179,4 @@ module.exports = {
 	purchaseBooks,
 	checkBookAvaililty
 }
+//TODO : check user's borrow
