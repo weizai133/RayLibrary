@@ -13,6 +13,6 @@ app.use(bodyParser.json())
 app.use('/auth', userRoute);
 app.use('/book', bookRoute);
 
-app.listen(3000, ()=>{
-	logger.info("Server is running on port 3000");
+app.listen(process.env.DEV_PORT, ()=>{
+	logger.info(`Server is running on port ${process.env.DEV_PORT}`);
 })
