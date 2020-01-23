@@ -9,9 +9,9 @@ const emailExist = (email) => {
 		db.query(sqlquery, {}, function(err, rows){
 			if(err) {
 				logger.info(err);
-				reject({status : 500, message: 'systemError'});
+				reject({succss : false, message: 'systemError'});
 			}
-			else if(rows) resolve({status : 200, isEmailExited : rows.length>0})
+			else if(rows) resolve({success : true, isEmailExited : rows.length>0})
 		})
 	})
 }
@@ -40,11 +40,11 @@ const createUser = (email, password, name, type, age) => {
 		const hashPw = await bcrypt.hash(password, 10);
 		
 		db.query(sqlquery, {email, password : hashPw, name, age, type}, function(err, rows){
-			if(err) reject({status : 500, message: err});
+			if(err) reject({success : false, message: err});
 			else if(rows && rows['insertId']) {
 				updateTokenAndAuthorisation({userId : rows['insertId'], email})
-				.then(result=> resolve({status : 200, data : {userId: rows['insertId'], email, token : result.token, authKey : result.authKey}}))
-				.catch(err => reject({status: 500, message: err}))
+				.then(result=> resolve({success : true, data : {userId: rows['insertId'], email, token : result.token, authKey : result.authKey}}))
+				.catch(err => reject({success: false, message: err}))
 			}
 		})
 	})
@@ -54,17 +54,17 @@ const signIn = (email, password) => {
 	return new Promise((resolve, reject)=>{
 		let sqlquery = `SELECT userId, email, password FROM user WHERE email="${email}";`
 		db.query(sqlquery, {}, (err, rows)=>{
-			if(err) reject({status: 500, message : err});
+			if(err) reject({success: false, message : err});
 			else if(rows && rows.length>0) {
 				bcrypt.compare(password, rows[0].password, (error, res)=>{
 					if(res) {
 						updateTokenAndAuthorisation({userId: rows[0].userId, email: rows[0].email})
-						.then(result=> resolve({status : 200, data : {userId: rows[0].userId, email, token : result.token, authKey : result.authKey}}))
+						.then(result=> resolve({success : true, data : {userId: rows[0].userId, email, token : result.token, authKey : result.authKey}}))
 					}
-					else reject({status : 400, message : 'Wrong password'});
+					else reject({success : false, message : 'Wrong password'});
 				})
 			}
-			else if(rows && rows.length===0) resolve({status: 200, message : "User doesn't exist"});
+			else if(rows && rows.length===0) resolve({success : true, message : "User doesn't exist"});
 		})
 	})
 }
@@ -75,8 +75,8 @@ const logout = (userId) => {
 		sqlquery += 'token = ? ';
 		sqlquery += 'WHERE id = ?';
 		db.query(sqlquery, [null, userId], function(err, rows){
-			if(err) reject({status : 500, message : err});
-			else if(rows) resolve({status : 200, logOut : true});
+			if(err) reject({success : false, message : err});
+			else if(rows) resolve({success : true, logOut : true});
 		})
 	})
 }

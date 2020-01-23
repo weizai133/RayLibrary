@@ -7,9 +7,9 @@ const createBook = (bookName, price, author = null) => {
 	return new Promise((resolve, reject)=>{
 		let sqlQuery = 'INSERT INTO book SET ?';
 		db.query(sqlQuery, {bookName, price, author}, function(err, rows){
-			if(err) reject({status : 500, message : 'systemError'});
+			if(err) reject({success : false, message : 'systemError'});
 			else if(rows) {
-				resolve({status: 200, data: {bookId: rows.insertId, bookName, price, author}});
+				resolve({success: true, data: {bookId: rows.insertId, bookName, price, author}});
 			}
 		})
 	})
@@ -20,8 +20,8 @@ const updateBook = (bookId, data) => {
 		let sqlQuery = 'UPDATE book SET ? ';
 		sqlQuery += ` WHERE bookId = ${bookId}`;
 		db.query(sqlQuery, [data], function(err, rows){
-			if(err) reject({status : 500, message: 'systemError'})
-			else if(rows) resolve({status:200, data: {bookId,data}})
+			if(err) reject({success : false, message: 'systemError'})
+			else if(rows) resolve({success: true, data: {bookId,data}})
 		})
 	})
 }
@@ -30,8 +30,8 @@ const getBooks = () => {
 	return new Promise((resolve,reject)=>{
 		let sqlQuery = 'SELECT * FROM book';
 		db.query(sqlQuery, {}, function(err, rows){
-			if(err) reject({status: 500, message: 'systemError'});
-			else if(rows && rows.length>0) resolve({status : 200, data : rows})
+			if(err) reject({success: false, message: 'systemError'});
+			else if(rows && rows.length>0) resolve({success : true, data : rows})
 		})
 	})
 }
@@ -41,8 +41,8 @@ const createBorrowOrder = (userId, bookId, from, to) =>{
 		let sqlquery = 'INSERT INTO borrow_order SET ?';
 		let duration = getDaysBetweenRange(from, to);
 		db.query(sqlquery, {bookId, userId, from, to,duration }, function(err, rows){
-			if(err) reject({status : 500, message: 'systemError'});
-			else if (rows) resolve({status : 200, data : {borrowId : rows.insertId}});
+			if(err) reject({success : false, message: 'systemError'});
+			else if (rows) resolve({success : true, data : {borrowId : rows.insertId}});
 		})
 	})
 }
@@ -52,9 +52,9 @@ const updateBorrowOrder = (borrowId, data) => {
 		let sqlQuery = `UPDATE borrow_order SET ? `;
 		sqlQuery += `WHERE borrowId = ${borrowId}`;
 		db.query(sqlQuery, [data], function(err, rows){
-			if(err) reject({status : 500, message : 'systemError'});
+			if(err) reject({success : false, message : 'systemError'});
 			else if(rows) {
-				resolve({status : 200, data: {borrowId, data} });
+				resolve({success : true, data: {borrowId, data} });
 			}
 		})
 	})
@@ -66,7 +66,7 @@ const getAllBorrowOrderByUserId = (userId) => {
 		sqlQuery += '((borrow_order INNER JOIN user on user.userId = borrow_order.userId AND user.userId = ? ) INNER JOIN book on book.bookId = borrow_order.bookId)';
 
 		db.query(sqlQuery, [userId], function(err, rows){
-			if(err) reject({status : 500, message: 'systemError'});
+			if(err) reject({success : false, message: 'systemError'});
 			else if(rows && rows.length>0) {
 				if(rows.find(val => val['hasReturn'] === 0 && moment(val.to).isBefore(moment()))){
 					 rows = rows.map(val=> (
@@ -81,11 +81,11 @@ const getAllBorrowOrderByUserId = (userId) => {
 						return	updateBorrowOrder(val.borrowId, {fine : val['fine']});
 					}))
 					.then(res=>{
-						resolve({status : 200, data : rows})
+						resolve({success : true, data : rows})
 					})
-					.catch(err=> reject({status : 500, message : 'systemError'}))
+					.catch(err=> reject({success : false, message : 'systemError'}))
 				}else{
-					resolve({status : 200, data : rows})
+					resolve({success : true, data : rows})
 				}
 			}
 		})
@@ -100,12 +100,12 @@ const returnBook = (borrowId, returnDate, fine) => {
 		sqlQuery += 'fine = ? ';
 		sqlQuery += 'WHERE borrowId = ?';
 		db.query(sqlQuery, [returnDate, fine, borrowId], function(err, rows){
-			if(err) reject({status : 500, message : err});
+			if(err) reject({success : false, message : err});
 			else if(rows) {
 				let sqlQuery = 'UPDATE book SET borrowed = 0 WHERE bookId = ?';
 				db.query(sqlQuery, [borrowId], function(err, bookRows){
-					if(err) reject({status : 500, message : 'systemError'});
-					else if(bookRows) resolve({status : 200, borrowId});
+					if(err) reject({success : false, message : 'systemError'});
+					else if(bookRows) resolve({success : true, borrowId});
 				})
 			}
 		})
@@ -116,9 +116,9 @@ const purchase = (bookId, orderId) => {
 	return new Promise((resolve, reject)=>{
 		let sqlQuery = `UPDATE book SET orderId = ?, sold = 1 WHERE bookId = ?`;
 		db.query(sqlQuery, [orderId, bookId], function(err, rows){
-			if(err) reject({status: 500, message: 'systemError'});
+			if(err) reject({success: false, message: 'systemError'});
 			else if(rows) {
-				resolve({status : 200, data : {bookId, orderId}})
+				resolve({success : true, data : {bookId, orderId}})
 			}
 		})
 	})
@@ -129,14 +129,14 @@ const purchaseBooks = (items, userId) =>{
 		let sqlQuery = 'INSERT INTO purchase_order SET ';
 		sqlQuery += 'userId = ? , items = ?;';
 		db.query(sqlQuery, [userId, items], function(err, rows){
-			if(err) reject({status:500, message: err});
+			if(err) reject({success:false, message: err});
 			else if(rows) {
 				logger.info('Purchasing book')
 				Promise.all(JSON.parse(items).map(val=>
 					 purchase(val, rows['insertId'])
 				))
 				.then(res=>{
-					resolve({status : 200, data : {orderId : rows['insertId'], items, userId} })
+					resolve({success : true, data : {orderId : rows['insertId'], items, userId} })
 				
 				})
 				.catch(err=>reject(err));
