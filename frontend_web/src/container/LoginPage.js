@@ -1,6 +1,6 @@
 import React,{ Component } from "react";
-import { fetchBooks } from "../API";
-import { login } from "../store/reducers/auth";
+import { login, logOut } from "../store/reducers/auth";
+import { fetchBooks } from "../store/reducers/book";
 import { connect } from "react-redux";
 import { setHeader } from "../API";
 
@@ -24,9 +24,9 @@ class LoginPage extends Component {
 	render(){
 		return (
 			<div>
-			<button onClick={()=>this.props.logIn(this.state.email, this.state.password)}>Click</button>
-			<button onClick={()=>fetchBooks()}>Click Me</button>
-		</div>
+				<button onClick={()=>this.props.logOut()}>Log Out</button>
+				<button onClick={()=>this.props.logIn(this.state.email, this.state.password)}>Click</button>
+			</div>
 		)
 	}
 }
@@ -40,7 +40,9 @@ const mapStateToProps = ({auth}) => {
 
 const mapDispatch = (dispatch) =>{
 	return {
-		logIn : (email, password) => dispatch(login({email, password}))
+		logIn : (email, password) => dispatch(login({email, password})),
+		logOut : () => dispatch(logOut()),
+		fetchBooks : () => dispatch(fetchBooks())
 	}
 }
 

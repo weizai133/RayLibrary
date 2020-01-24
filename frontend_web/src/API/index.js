@@ -24,7 +24,7 @@ export const loginRequest = (email, password) => {
 	})
 }
 
-export const fetchBooks = () => {
+export const fetchBooksRequest = () => {
 	return new Promise((resolve, reject)=>{
 		apiCall('post', '/book')
 		.then(res => resolve(res))
