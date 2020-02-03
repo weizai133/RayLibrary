@@ -13,10 +13,11 @@ router.post('/signup', async (req, res)=>{
 			.catch(err=> res.status(200).json(err));
 		}
 		else{
-			res.status(200).json(emailExist)
+			res.status(200).json(emailResult)
 		}
 
 	} catch (error) {
+		console.log('Here');
 		res.json({status: 500, message : error})
 	}
 })

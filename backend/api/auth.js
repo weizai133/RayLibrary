@@ -11,7 +11,7 @@ const emailExist = (email) => {
 				logger.info(err);
 				reject({succss : false, message: 'systemError'});
 			}
-			else if(rows) resolve({success : true, isEmailExited : rows.length>0})
+			else if(rows) resolve({success : true, isEmailExisted : rows.length>0})
 		})
 	})
 }
@@ -33,13 +33,13 @@ const updateTokenAndAuthorisation = (payload) => {
 	})
 }
 
-const createUser = (email, password, name, type, age) => {
+const createUser = (email, password, userName, type, age) => {
 	return new Promise(async (resolve, reject)=>{
 		let sqlquery = "INSERT INTO user SET ?";
 
 		const hashPw = await bcrypt.hash(password, 10);
 		
-		db.query(sqlquery, {email, password : hashPw, name, age, type}, function(err, rows){
+		db.query(sqlquery, {email, password : hashPw, userName, age, type}, function(err, rows){
 			if(err) reject({success : false, message: err});
 			else if(rows && rows['insertId']) {
 				updateTokenAndAuthorisation({userId : rows['insertId'], email})
