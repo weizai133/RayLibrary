@@ -1,42 +1,39 @@
-import React, {Component} from "react";
+import React, {useState} from "react";
 import { connect } from "react-redux";
-import { Switch, Route, NavLink } from "react-router-dom";
+import { Switch, Route, NavLink, useRouteMatch, useHistory } from "react-router-dom";
+import {store} from "../store";
 import { logOut } from "../store/reducers/auth";
 import NewBook from "./NewBook";
 import BooksList from "./BooksList";
 import "../css/home.css";
-// import Menu from "../components/Menu";
 import { Layout, Menu, Icon } from 'antd';
 const { Header, Sider, Content } = Layout;
 const {SubMenu} = Menu;
 
-class Home extends Component {
+export default function Home() {
 
-  state = {
-    collapsed: false,
-  };
+	const {path, url} = useRouteMatch();
+	const [collapsed, setCollapsed] = useState(false);
+	const history = useHistory();
 	
-  toggle = () => {
-    this.setState({
-      collapsed: !this.state.collapsed,
-    });
+  const toggle = () => {
+    // this.setState({
+    //   collapsed: !this.state.collapsed,
+		// });
+		setCollapsed(true);
 	};
 	
-	logOutHandler = () => {
-		this.props.logOut();
-		this.props.history.push('/')
+	const logOutHandler = () => {
+		// this.props.logOut();
+		// this.props.history.push('/')
+		store.dispatch(logOut());
+		history.push('/');
 	}
 
-	goToNew = () => {
-		
-	}
-
-	render(){
-		console.log(this.props.history.location.pathname)
 		return (
 			<div>
 				<Layout>
-					<Sider trigger={null} collapsible collapsed={this.state.collapsed}>
+					<Sider trigger={null} collapsible collapsed={collapsed}>
 						<div className="logo">RayLib</div>
 						<Menu
 							defaultSelectedKeys={['book1']}
@@ -64,7 +61,7 @@ class Home extends Component {
 								<Icon type="user" />
 								<span>Users</span>
 							</Menu.Item>
-							<Menu.Item key="sub3" onClick={()=>this.logOutHandler()}>
+							<Menu.Item key="sub3" onClick={()=>logOutHandler()}>
 								<Icon type="upload" />
 								<span>Log Out</span>
 							</Menu.Item>
@@ -74,8 +71,8 @@ class Home extends Component {
 						<Header style={{ background: '#fff', padding: 0 }}>
 							<Icon
 								className="trigger"
-								type={this.state.collapsed ? 'menu-unfold' : 'menu-fold'}
-								onClick={this.toggle}
+								type={collapsed ? 'menu-unfold' : 'menu-fold'}
+								onClick={() => toggle()}
 							/>
 						</Header>
 						<Content
@@ -87,26 +84,12 @@ class Home extends Component {
 							}}
 						>
 							<Switch>
-								<Route path={`${this.props.history.location.pathname}`} exact render={()=><BooksList />} />
-								<Route path={`${this.props.history.location.pathname}/new`} exact render={()=><NewBook />} />
+								<Route exact path={`${path}`} render={()=><BooksList />} />
+								<Route path={`${path}/new`} render={()=><NewBook />} />
 							</Switch>
 						</Content>
 					</Layout>
 				</Layout>
 			</div>
 		)
-	}
-	
 }
-
-const mapStateToProps = () =>{
-	return {}
-}
-
-const mapDispatchToProps = (dispatch) => {
-	return {
-		logOut : ()=> dispatch(logOut())
-	}
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(Home);
