@@ -14,7 +14,6 @@ class BookList extends Component {
 	}
 
 	render(){
-		console.log('Here')
 		return (
 			<div>
 				{this.mapBooks()}	

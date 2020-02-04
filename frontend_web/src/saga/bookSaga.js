@@ -1,4 +1,4 @@
-import { put, select, call } from "redux-saga/effects";
+import { put, call } from "redux-saga/effects";
 import { initBooks } from "../store/reducers/book";
 import { fetchBooksRequest } from "../API";;
 

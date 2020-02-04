@@ -4,7 +4,6 @@ import { connect } from "react-redux";
 export default function withAuth(NextComponent) {
 	class Authenticate extends Component{
 		componentWillMount(){
-			console.log(this.props);
 			if(!this.props.isLogin || !this.props.token || !this.props.authKey || !this.props.userId){
 				this.props.history.push('/');
 			}

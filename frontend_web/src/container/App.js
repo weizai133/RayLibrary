@@ -1,6 +1,5 @@
 import React from 'react';
-import { Switch, Route, Link } from "react-router-dom";
-import { connect } from "react-redux";
+import { Switch, Route } from "react-router-dom";
 import Home from "./Home";
 import LoginPage from "./LoginPage";
 import { initUser } from "../store/reducers/auth";
@@ -28,12 +27,6 @@ function App(props) {
      </Switch>
     </div>
   );
-}
-
-const mapDispatchToProps = (dispatch) =>{
-  return {
-    initUser : (payload)=> dispatch(initUser(payload))
-  }
 }
 
 export default App;
