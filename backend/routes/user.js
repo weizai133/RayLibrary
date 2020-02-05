@@ -56,4 +56,12 @@ router.post('/logout/:id', (req, res)=>{
 	.catch(err=>res.status(400).json(err));
 })
 
+router.post('/getUsers/:type', (req, res)=>{
+	if(!req.params.type) res.status(400).json({status : 400, message : 'Type is required'});
+
+	authApi.getUsersByTypes(req.params.type)
+	.then(result => res.status(200).json(result))
+	.catch(err => res.status(400).json(err));
+});
+
 module.exports = router;

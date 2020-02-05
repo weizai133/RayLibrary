@@ -88,10 +88,29 @@ const getUserTypes = () => (
 	}
 )
 
+const getUsersByTypes = (type) => {
+	return new Promise((resolve, reject)=>{
+		let sqlquery = 'SELECT userId, email, userName FROM user';
+		if(type!=='ALL') {
+			if(Object.keys(getUserTypes()).find(val => val === type)) sqlquery+= ' WHERE type = ?';
+			else{
+				reject({success : false, message : 'Invalid Type'});
+				return;
+			}
+		}
+
+		db.query(sqlquery, [type], function(err, rows){
+			if(err) reject({success: false, message : err});
+			else if(rows) resolve({success : true, data : rows});
+		})
+	})
+}
+
 module.exports = {
 	createUser,
 	signIn,
 	getUserTypes,
 	emailExist,
-	logout
+	logout,
+	getUsersByTypes
 }
