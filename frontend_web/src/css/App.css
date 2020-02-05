@@ -11,6 +11,14 @@
   margin: 0 8px 8px 0;
 }
 
+.errorMessage {
+  color : red;
+}
+
+.loginBtn{
+  display: flex;
+  justify-content: center;
+}
 
 .CentreContainer {
   position: absolute;

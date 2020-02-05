@@ -64,7 +64,7 @@ const signIn = (email, password) => {
 					else reject({success : false, message : 'Wrong password'});
 				})
 			}
-			else if(rows && rows.length===0) resolve({success : true, message : "User doesn't exist"});
+			else if(rows && rows.length===0) resolve({success : false, message : "User doesn't exist"});
 		})
 	})
 }

@@ -12,55 +12,55 @@ authRouter.post('/new', (req, res)=>{
 		})
 	} catch (error) {
 		logger.logFail(error);
-		res.status(500).json(error);
+		res.status(200).json(error);
 	}
 })
 
 authRouter.post('/', (req, res)=>{ 
 	bookApi.getBooks()
 	.then(result => res.status(200).json(result))
-	.catch(err=> res.status(400).json(result));
+	.catch(err=> res.status(200).json(result));
 })
 
 authRouter.put('/updateBook/:bookId', (req, res)=>{
 	if(!req.params.bookId || !req.body){
-		res.status(400).json({status : 400, message : 'Not valid input'});
+		res.status(400).json({status : 200, message : 'Not valid input'});
 		return;
 	}
 	bookApi.updateBook(req.params.bookId, req.body)
 	.then(result => res.status(200).json(result))
-	.catch(err => res.status(400).json(err));
+	.catch(err => res.status(200).json(err));
 })
 
 authRouter.post('/borrow', (req, res)=>{
 	const {userId, bookId, from, to} = req.body;
 	if(!userId || !bookId || !from || !to){
-		res.status(400).json({status: 400, message: 'Not valid input'});
+		res.status(400).json({status: 200, message: 'Not valid input'});
 		return;
 	}
 	bookApi.createBorrowOrder(userId, bookId, from, to)
 	.then(result=>res.status(200).json(result))
-	.catch(err=>res.status(400).json(err));
+	.catch(err=>res.status(200).json(err));
 })
 
 authRouter.post('/borrow/getBorrowBook/:userId', (req, res)=>{
 	if(!req.params.userId) {
-		res.status(400).json({status : 400, message : 'Need user Id on param'});
+		res.status(400).json({status : 200, message : 'Need user Id on param'});
 		return;
 	}
 	bookApi.getAllBorrowOrderByUserId(req.params.userId)
 	.then(result => res.status(200).json(result))
-	.catch(err => res.status(400).json(err));
+	.catch(err => res.status(200).json(err));
 })
 
 authRouter.post('/borrow/returnBook/:borrowId', (req, res)=>{
 	if(!req.params.borrowId || !req.body.returnDate) {
-		res.status(400).json({status: 400, message : 'Need borrow book Id or return date'});
+		res.status(400).json({status: 200, message : 'Need borrow book Id or return date'});
 		return;
 	}
 	bookApi.returnBook(req.params.borrowId, req.body.returnDate, req.body.fine)
 	.then(result=> res.status(200).json(result))
-	.catch(err=> res.status(400).json(err));
+	.catch(err=> res.status(200).json(err));
 })
 
 authRouter.post('/buyBooks', (req, res)=>{
@@ -83,14 +83,14 @@ authRouter.post('/buyBooks', (req, res)=>{
 				res.status(200).json({status: 200, orderReady : true, data : purchaseResult});
 				return;
 			} catch (error) {
-				res.status(400).json(err);
+				res.status(200).json(err);
 				return;
 			}
 		}else{
 			res.status(200).json({status: 200, orderReady : false, data : result.data})
 		}
 	})
-	.catch(err => res.status(400).json(err));
+	.catch(err => res.status(200).json(err));
 })
 
 module.exports = authRouter;

@@ -1,5 +1,5 @@
 import React,{ Component } from "react";
-import { login, logOut } from "../store/reducers/auth";
+import { login, logOut, authError } from "../store/reducers/auth";
 import { connect } from "react-redux";
 import { Form, Icon, Input, Button, Checkbox } from 'antd';
 import "../css/App.css";
@@ -37,9 +37,10 @@ class LoginPage extends Component {
 			<div id="loginForm" className="CentreContainer">
 				<span>RayLib</span>
 				<Form layout="vertical" onSubmit={(e)=>this.submitHandler(e)}>
-					<Input placeholder="Email" onBlur={(e)=>this.setState({email : e.target.value})} />
-					<Input.Password placeholder="Password" onBlur={(e)=>this.setState({password : e.target.value})} />
-					<Button type="primary" htmlType="submit">Click</Button>
+					<Input placeholder="Email" onBlur={(e)=>{this.setState({email : e.target.value}); this.props.clearError();} }/>
+					<Input.Password placeholder="Password" onBlur={(e)=>{this.setState({password : e.target.value}); this.props.clearError();} }/>
+					<div className="loginBtn"><Button type="primary" htmlType="submit">Click</Button></div>
+					<div className="errorMessage">{!this.props.error ? '' : this.props.error}</div>
 			</Form>
 			</div>
 		)
@@ -50,14 +51,16 @@ const mapStateToProps = ({auth}) => {
 	return {
 		token : auth.token,
 		authKey : auth.authKey,
-		isLogin : auth.isLogin
+		isLogin : auth.isLogin,
+		error : auth.error
 	}
 }
 
 const mapDispatch = (dispatch) =>{
 	return {
 		logIn : (email, password) => dispatch(login({email, password})),
-		logOut : () => dispatch(logOut()) 
+		logOut : () => dispatch(logOut()),
+		clearError : () => dispatch(authError(null)) 
 	}
 }
 

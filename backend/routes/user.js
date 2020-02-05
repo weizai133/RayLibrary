@@ -17,7 +17,7 @@ router.post('/signup', async (req, res)=>{
 		}
 
 	} catch (error) {
-		res.json({status: 500, message : error})
+		res.status(200).json({status: 200, message : error})
 	}
 })
 
@@ -27,19 +27,19 @@ router.post('/getUserTypes', (req, res)=>{
 
 router.post('/signIn', (req, res)=>{
 	if(!req.body.email || !req.body.password) {
-		res.status(400).json('Not Valid Input');
+		res.status(200).json('Not Valid Input');
 		return;
 	}
 
 	authApi.signIn(req.body.email, req.body.password)
 	.then(result=> res.status(200).json(result))
-	.catch(err => res.status(400).json(err));
+	.catch(err => res.status(200).json(err));
 
 })
 
 router.post('/emailExist', (req, res)=>{
 	if(!req.body.email) {
-		res.status(400).json({status: 400, message : 'Email is required'});
+		res.status(200).json({success: false, message : 'Email is required'});
 		return;
 	}
 
@@ -47,21 +47,21 @@ router.post('/emailExist', (req, res)=>{
 	.then(result=>{
 		res.status(200).json(result);
 	})
-	.catch(err=>res.status(400).json(err));
+	.catch(err=>res.status(200).json(err));
 })
 
 router.post('/logout/:id', (req, res)=>{
 	authApi.logout(req.params.id)
 	.then(result=>res.status(200).json(result))
-	.catch(err=>res.status(400).json(err));
+	.catch(err=>res.status(200).json(err));
 })
 
 router.post('/getUsers/:type', (req, res)=>{
-	if(!req.params.type) res.status(400).json({status : 400, message : 'Type is required'});
+	if(!req.params.type) res.status(200).json({success : false, message : 'Type is required'});
 
 	authApi.getUsersByTypes(req.params.type)
 	.then(result => res.status(200).json(result))
-	.catch(err => res.status(400).json(err));
+	.catch(err => res.status(200).json(err));
 });
 
 module.exports = router;

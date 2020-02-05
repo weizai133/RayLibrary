@@ -29,16 +29,20 @@ export const initUser = (payload) => {
 	return {type : INIT_USER, payload : payload.data}
 }
 
+export const authError = (payload) => {
+	return {type : AUTH_ERROR, payload};
+}
+
 export const authReducer = (state = initialState, action) => {
 	switch (action.type) {
 		case LOGIN:
-			return {...state, ...action.payload};
+			return {...state, ...action.payload, error : null};
 		case INIT_USER:
 			return {...state, ...action.payload, isLogin : true};
 		case LOG_OUT:
 			return {...initialState};
 		case AUTH_ERROR :
-			return {...initialState};
+			return {...initialState, error : action.payload};
 		default:
 			return state;;
 	}
