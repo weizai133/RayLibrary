@@ -1,10 +1,10 @@
 import React, {useState} from "react";
-import { connect } from "react-redux";
-import { Switch, Route, NavLink, useRouteMatch, useHistory } from "react-router-dom";
+import { Switch, Route, Link, useRouteMatch, useHistory } from "react-router-dom";
 import {store} from "../store";
 import { logOut } from "../store/reducers/auth";
 import NewBook from "./NewBook";
 import BooksList from "./BooksList";
+import UserPage from "./Users";
 import "../css/home.css";
 import { Layout, Menu, Icon } from 'antd';
 const { Header, Sider, Content } = Layout;
@@ -12,10 +12,12 @@ const {SubMenu} = Menu;
 
 export default function Home() {
 
-	const {path, url} = useRouteMatch();
-	const [collapsed, setCollapsed] = useState(false);
 	const history = useHistory();
-	
+	const {path} = useRouteMatch();
+	const [collapsed, setCollapsed] = useState(false);
+	const [nav, SetNav] = useState(path);
+	const [subNav, setSubNav] = useState(history.location.pathname);
+
   const toggle = () => {
     // this.setState({
     //   collapsed: !this.state.collapsed,
@@ -36,11 +38,11 @@ export default function Home() {
 					<Sider trigger={null} collapsible collapsed={collapsed}>
 						<div className="logo">RayLib</div>
 						<Menu
-							defaultSelectedKeys={['book1']}
-							defaultOpenKeys={['sub1']} 
+							defaultOpenKeys={[nav]} 
+							defaultSelectedKeys={[subNav]}
 							theme="dark" mode="inline">
 							<SubMenu
-								key="sub1"
+								key="/home"
 								title={
 									<span>
 										<Icon type="book" />
@@ -48,18 +50,20 @@ export default function Home() {
 									</span>
 								}
 							>
-								<Menu.Item key="book1">
-									<NavLink to="/home">Books</NavLink>
+								<Menu.Item key="/home">
+									<Link to="/home">Books</Link>
 								</Menu.Item>
-								<Menu.Item key="book2">
-									<NavLink to="/home/new">New Book</NavLink>
+								<Menu.Item key="/home/newBook">
+									<Link to="/home/newBook">New Book</Link>
 								</Menu.Item>
-								<Menu.Item key="book3">Borrow</Menu.Item>
-								<Menu.Item key="book4">Purchase</Menu.Item>
+								<Menu.Item key="/home/borrow">Borrow</Menu.Item>
+								<Menu.Item key="/home/purchase">Purchase</Menu.Item>
 							</SubMenu>
-							<Menu.Item key="sub2">
-								<Icon type="user" />
-								<span>Users</span>
+							<Menu.Item key="/home/user">
+								<Link to="/home/user">
+									<Icon type="user" />
+									<span>Users</span>
+								</Link>
 							</Menu.Item>
 							<Menu.Item key="sub3" onClick={()=>logOutHandler()}>
 								<Icon type="upload" />
@@ -85,7 +89,8 @@ export default function Home() {
 						>
 							<Switch>
 								<Route exact path={`${path}`} render={()=><BooksList />} />
-								<Route path={`${path}/new`} render={()=><NewBook />} />
+								<Route path={`${path}/newBook`} render={()=><NewBook />} />
+								<Route path={`${path}/user`} render={()=><UserPage />}/>
 							</Switch>
 						</Content>
 					</Layout>

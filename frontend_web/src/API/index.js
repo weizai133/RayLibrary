@@ -31,3 +31,11 @@ export const fetchBooksRequest = () => {
 		.catch(err=> reject(err));
 	})
 }
+
+export const fetchUsersRequest = (type) => {
+	return new Promise((resolve, reject)=> {
+		apiCall('post', `/auth/getUsers/${type}`)
+		.then(res => resolve(res))
+		.catch(err => reject(err));
+	})
+}

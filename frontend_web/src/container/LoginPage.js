@@ -1,6 +1,8 @@
 import React,{ Component } from "react";
 import { login, logOut } from "../store/reducers/auth";
 import { connect } from "react-redux";
+import { Form, Icon, Input, Button, Checkbox } from 'antd';
+import "../css/App.css";
 
 class LoginPage extends Component {
 	constructor(props){
@@ -21,14 +23,24 @@ class LoginPage extends Component {
 		}
 	}
 
-	loginHandler(){
+	loginHandler=()=>{
+		this.props.logIn(this.state.email, this.state.password);
+	}
+
+	submitHandler = (e) =>{
+		e.preventDefault();
 		this.props.logIn(this.state.email, this.state.password);
 	}
 
 	render(){
 		return (
-			<div>
-				<button onClick={()=>this.loginHandler()}>Click</button>
+			<div id="loginForm" className="CentreContainer">
+				<span>RayLib</span>
+				<Form layout="vertical" onSubmit={(e)=>this.submitHandler(e)}>
+					<Input placeholder="Email" onBlur={(e)=>this.setState({email : e.target.value})} />
+					<Input.Password placeholder="Password" onBlur={(e)=>this.setState({password : e.target.value})} />
+					<Button type="primary" htmlType="submit">Click</Button>
+			</Form>
 			</div>
 		)
 	}
