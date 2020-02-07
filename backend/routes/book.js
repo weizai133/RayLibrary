@@ -22,6 +22,14 @@ authRouter.post('/', (req, res)=>{
 	.catch(err=> res.status(200).json(result));
 })
 
+authRouter.post('/searchBookById/:bookId', (req, res)=>{
+	if(!req.params.bookId) res.status(200).json({success : false, message : 'Need the book id!'});
+	
+	bookApi.searchBookById(req.params.bookId)
+	.then(result => res.status(200).json(result))
+	.catch(err => res.status(200).json(err));
+})
+
 authRouter.put('/updateBook/:bookId', (req, res)=>{
 	if(!req.params.bookId || !req.body){
 		res.status(400).json({status : 200, message : 'Not valid input'});
@@ -64,7 +72,7 @@ authRouter.post('/borrow/returnBook/:borrowId', (req, res)=>{
 })
 
 authRouter.post('/buyBooks', (req, res)=>{
-	if(!req.body.books || !req.body.userId) {
+	if(!req.body.books || !req.body.userId || !req.body.price) {
 		res.status(400).json({status: 200, message: 'Invalid input'});
 		return;
 	}
@@ -79,7 +87,7 @@ authRouter.post('/buyBooks', (req, res)=>{
 	.then(async (result) => {
 		if(result.orderReady){
 			try {
-				const purchaseResult = await bookApi.purchaseBooks(req.body.books, req.body.userId)
+				const purchaseResult = await bookApi.purchaseBooks(req.body.books, req.body.userId, req.body.price);
 				res.status(200).json({status: 200, orderReady : true, data : purchaseResult});
 				return;
 			} catch (error) {

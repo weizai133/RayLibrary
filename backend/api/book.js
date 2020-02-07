@@ -15,6 +15,18 @@ const createBook = (bookName, price, author = null) => {
 	})
 }
 
+const searchBookById = (bookId) => {
+	return new Promise((resolve, reject)=>{
+		let sqlQuery = 'SELECT * FROM book where bookId = ? AND active = 1';
+
+		db.query(sqlQuery, [bookId], function(err, rows){
+			if(err) reject({success: false, message : err});
+			else if(rows && rows.length>0) resolve({success : true, data : rows[0]});
+			else if(rows && rows.length === 0) reject({success : false, message : 'Book does not exist'});
+		})
+	})
+}
+
 const updateBook = (bookId, data) => {
 	return new Promise((resolve, reject)=>{
 		let sqlQuery = 'UPDATE book SET ? ';
@@ -124,11 +136,11 @@ const purchase = (bookId, orderId) => {
 	})
 }
 
-const purchaseBooks = (items, userId) =>{
+const purchaseBooks = (items, userId, price) =>{
 	return new Promise((resolve, reject)=>{
 		let sqlQuery = 'INSERT INTO purchase_order SET ';
-		sqlQuery += 'userId = ? , items = ?;';
-		db.query(sqlQuery, [userId, items], function(err, rows){
+		sqlQuery += 'userId = ? , items = ?, price = ?;';
+		db.query(sqlQuery, [userId, items, price], function(err, rows){
 			if(err) reject({success:false, message: err});
 			else if(rows) {
 				logger.info('Purchasing book')
@@ -175,6 +187,7 @@ module.exports = {
 	createBorrowOrder,
 	getAllBorrowOrderByUserId,
 	returnBook,
+	searchBookById,
 	updateBook,
 	purchaseBooks,
 	checkBookAvaililty
