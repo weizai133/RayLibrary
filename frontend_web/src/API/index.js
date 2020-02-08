@@ -1,5 +1,8 @@
 import axios from "axios";
-const BASE_URL = 'http://localhost:3001'
+import { store } from "../store";
+import { logOut } from "../store/reducers/auth";
+import { openNotification } from "../helper";
+const BASE_URL = 'http://localhost:3001';
 
 export const setHeader = (token, authKey) => {
 	axios.defaults.headers.common['x-access-token'] = token;
@@ -12,7 +15,11 @@ export const apiCall = (method, url, data = null) =>{
 			url : `${BASE_URL}${url}`,
 			method, data})
 		.then(res=>resolve(res))
-		.catch(err=>reject(err));
+		.catch(err=>{
+			openNotification('error', "Network Error", "Please check your network.");
+			store.dispatch(logOut());
+			reject(err)
+		});
 	})
 }
 
@@ -35,6 +42,14 @@ export const fetchBooksRequest = () => {
 export const fetchUsersRequest = (type) => {
 	return new Promise((resolve, reject)=> {
 		apiCall('post', `/auth/getUsers/${type}`)
+		.then(res => resolve(res))
+		.catch(err => reject(err));
+	})
+}
+
+export const getBookById = (bookId) => {
+	return new Promise((resolve, reject)=>{
+		apiCall('post', `/book/searchBookById/${bookId}`)
 		.then(res => resolve(res))
 		.catch(err => reject(err));
 	})

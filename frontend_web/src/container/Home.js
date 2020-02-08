@@ -4,6 +4,7 @@ import {store} from "../store";
 import { logOut } from "../store/reducers/auth";
 import NewBook from "./NewBook";
 import BooksList from "./BooksList";
+import PurchasePage from "./PurchasePage";
 import UserPage from "./Users";
 import "../css/home.css";
 import { Layout, Menu, Icon } from 'antd';
@@ -57,7 +58,9 @@ export default function Home() {
 									<Link to="/home/newBook">New Book</Link>
 								</Menu.Item>
 								<Menu.Item key="/home/borrow">Borrow</Menu.Item>
-								<Menu.Item key="/home/purchase">Purchase</Menu.Item>
+								<Menu.Item key="/home/purchase">
+									<Link to="/home/purchase">Purchase</Link>
+								</Menu.Item>
 							</SubMenu>
 							<Menu.Item key="/home/user">
 								<Link to="/home/user">
@@ -91,6 +94,7 @@ export default function Home() {
 								<Route exact path={`${path}`} render={()=><BooksList />} />
 								<Route path={`${path}/newBook`} render={()=><NewBook />} />
 								<Route path={`${path}/user`} render={()=><UserPage />}/>
+								<Route path={`${path}/purchase`} render={()=><PurchasePage />} />
 							</Switch>
 						</Content>
 					</Layout>

@@ -40,7 +40,6 @@ class LoginPage extends Component {
 					<Input placeholder="Email" onBlur={(e)=>{this.setState({email : e.target.value}); this.props.clearError();} }/>
 					<Input.Password placeholder="Password" onBlur={(e)=>{this.setState({password : e.target.value}); this.props.clearError();} }/>
 					<div className="loginBtn"><Button type="primary" htmlType="submit">Click</Button></div>
-					<div className="errorMessage">{!this.props.error ? '' : this.props.error}</div>
 			</Form>
 			</div>
 		)

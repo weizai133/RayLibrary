@@ -1,9 +1,9 @@
 import { takeLatest, all } from "redux-saga/effects";
 import { LOGIN } from "../store/reducers/auth";
-import { GET_BOOKS } from "../store/reducers/book";
+import { GET_BOOKS, SEARCH_A_BOOK } from "../store/reducers/book";
 import { FETCH_USERS } from "../store/reducers/user";
 import { login } from "./authSaga";
-import { getBooks } from "./bookSaga";
+import { getBooks, searchBook } from "./bookSaga";
 import { fetchUsers } from "./userSaga";
 
 export default function* rootSaga(){
@@ -12,7 +12,8 @@ export default function* rootSaga(){
 			login : yield takeLatest(LOGIN, login)
 		}),
 		book : all({
-			fetchBooks : yield takeLatest(GET_BOOKS, getBooks)
+			fetchBooks : yield takeLatest(GET_BOOKS, getBooks),
+			searchBook : yield takeLatest(SEARCH_A_BOOK, searchBook)
 		}),
 		user : all({
 			fetchUsers: yield takeLatest(FETCH_USERS, fetchUsers)

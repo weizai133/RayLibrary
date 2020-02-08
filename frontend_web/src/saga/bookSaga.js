@@ -1,6 +1,7 @@
-import { put, call } from "redux-saga/effects";
-import { initBooks } from "../store/reducers/book";
-import { fetchBooksRequest } from "../API";;
+import { put, call, select } from "redux-saga/effects";
+import { initBooks, setError, addToCart } from "../store/reducers/book";
+import { fetchBooksRequest, getBookById,  } from "../API";
+import { openNotification } from "../helper";
 
 export function* getBooks(){
 	const res = yield call(()=>fetchBooksRequest());
@@ -10,3 +11,20 @@ export function* getBooks(){
 	}
 }
 
+export function* searchBook(){
+	const { searchBookId } = yield select(state => state.book);
+
+	const res = yield call(()=> getBookById(searchBookId));
+
+	if(res.data.success) {
+		if(res.data.data.borrowed===1 || res.data.data.sold===1){
+			openNotification('warn', "Sorry", `Book(${res.data.data.bookName}) is not available`)
+			// yield put(setError(`Book(${res.data.data.bookName}) is not available`));
+		}
+		else{
+			yield put(addToCart(res.data.data));
+		}
+	}else{
+		yield put(setError(res.data.message));
+	}
+}
