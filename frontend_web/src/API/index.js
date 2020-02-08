@@ -54,3 +54,19 @@ export const getBookById = (bookId) => {
 		.catch(err => reject(err));
 	})
 }
+
+export const createNewBook = (book) => {
+	return new Promise((resolve, reject)=> {
+		apiCall('post,', '/book/new', book)
+		.then(res => resolve(res))
+		.catch(err => reject(err));
+	})
+}
+
+export const generateNewBooksRequest = (books) => {
+	return new Promise((resolve, reject)=> {
+		apiCall('post', '/book/createMultipleBooks', {books})
+		.then(res => resolve(res))
+		.catch(err => reject(err));
+	})
+}

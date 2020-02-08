@@ -1,6 +1,6 @@
 import { put, call, select } from "redux-saga/effects";
-import { initBooks, setError, addToCart } from "../store/reducers/book";
-import { fetchBooksRequest, getBookById,  } from "../API";
+import { initBooks, setError, addToCart, initCreateBooks, setLoading, setCreateBooksStatus } from "../store/reducers/book";
+import { fetchBooksRequest, getBookById, generateNewBooksRequest } from "../API";
 import { openNotification } from "../helper";
 
 export function* getBooks(){
@@ -26,5 +26,18 @@ export function* searchBook(){
 		}
 	}else{
 		yield put(setError(res.data.message));
+	}
+}
+
+export function* generateNewBooks(){
+	const { newBooks } = yield select(state => state.book);
+
+	const res = yield call(()=> generateNewBooksRequest(newBooks));
+
+	if(res.data.success) {
+		openNotification('success', 'Books are created.', null)
+		yield(put(initCreateBooks(res.data.data)));
+		yield(put(setCreateBooksStatus('success')));
+		yield(put(setLoading(false)));
 	}
 }

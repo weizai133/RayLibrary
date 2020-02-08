@@ -23,7 +23,7 @@ export default function Home() {
     // this.setState({
     //   collapsed: !this.state.collapsed,
 		// });
-		setCollapsed(true);
+		setCollapsed(!collapsed);
 	};
 	
 	const logOutHandler = () => {

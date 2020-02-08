@@ -1,9 +1,11 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { getABook, fetchBooks, bookReducer } from "../store/reducers/book";
-import { Input } from "antd";
+import { Input, Table, Divider, Tag } from "antd";
 import "../css/App.css";
+
 const { Search } = Input;
+
 
 class PurchasePage extends Component{
 
@@ -23,14 +25,15 @@ class PurchasePage extends Component{
 	render(){
 		return (
 			<div>
-				<Search 
-					placeholder="Input book Id"
-					value={this.state.searchValue}
-					onChange={(e)=>this.setState({searchValue : e.target.value})}
-					onSearch={value => this.searchBookHandler(value)} 
-					enterButton
-				/>
-				<div className="errorMessage">{this.props.error ? this.props.error : ''}</div>
+				<div className="searchInput">
+					<Search 
+						placeholder="Input book Id"
+						value={this.state.searchValue}
+						onChange={(e)=>this.setState({searchValue : e.target.value})}
+						onSearch={value => this.searchBookHandler(value)} 
+						enterButton
+					/>
+				</div>
 			</div>
 		)
 	}

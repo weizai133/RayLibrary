@@ -11,6 +11,10 @@
   margin: 0 8px 8px 0;
 }
 
+.searchInput {
+  max-width: 30%;
+}
+
 .errorMessage {
   color : red;
 }

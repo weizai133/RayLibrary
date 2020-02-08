@@ -15,6 +15,16 @@ const createBook = (bookName, price, author = null) => {
 	})
 }
 
+const createMultipleBooks = (books) => {
+	return new Promise((resolve, reject) => {
+		Promise.all(
+			books.map(val => createBook(val['bookName'], val['price'], val['author']))
+		)
+		.then(res => resolve({success: true, data : res}))
+		.catch(err => reject({success : false, message : "Something wrong in the books..."}));
+	})
+}
+
 const searchBookById = (bookId) => {
 	return new Promise((resolve, reject)=>{
 		let sqlQuery = 'SELECT * FROM book where bookId = ? AND active = 1';
@@ -190,6 +200,6 @@ module.exports = {
 	searchBookById,
 	updateBook,
 	purchaseBooks,
-	checkBookAvaililty
+	checkBookAvaililty,
+	createMultipleBooks
 }
-//TODO : check user's borrow
