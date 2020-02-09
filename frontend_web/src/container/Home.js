@@ -16,19 +16,14 @@ export default function Home() {
 	const history = useHistory();
 	const {path} = useRouteMatch();
 	const [collapsed, setCollapsed] = useState(false);
-	const [nav, SetNav] = useState(path);
-	const [subNav, setSubNav] = useState(history.location.pathname);
+	const [nav] = useState(path);
+	const [subNav] = useState(history.location.pathname);
 
   const toggle = () => {
-    // this.setState({
-    //   collapsed: !this.state.collapsed,
-		// });
 		setCollapsed(!collapsed);
 	};
 	
 	const logOutHandler = () => {
-		// this.props.logOut();
-		// this.props.history.push('/')
 		store.dispatch(logOut());
 		history.push('/');
 	}

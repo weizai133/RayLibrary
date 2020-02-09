@@ -1,25 +1,24 @@
-import React, { Component } from "react";
+import React, { useEffect } from "react";
 import { connect } from "react-redux";
 import { fetchBooks } from "../store/reducers/book";
 
-class BookList extends Component {
-	componentDidMount(){
-		this.props.fetchBooks()
-	}
+function BookList(props) {
+	useEffect(()=>{
+		props.fetchBooks()
+	}, []);
 
-	mapBooks(){
-		return this.props.listOfBooks.map(val=>(
+	function mapBooks(){
+		return props.listOfBooks.map(val=>(
 			<div key={val.bookId}>{val.bookName}</div>
 		))
 	}
 
-	render(){
-		return (
-			<div>
-				{this.mapBooks()}	
-			</div>
-		)
-	}
+	return (
+		<div>
+			{mapBooks()}	
+		</div>
+	)
+	
 
 }
 

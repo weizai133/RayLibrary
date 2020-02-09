@@ -1,26 +1,26 @@
-import React,  {Component} from "react";
+import React, {useEffect} from "react";
 import { connect } from "react-redux";
 import { fetchUsers } from "../store/reducers/user";
 
-class Users extends Component {
+function Users(props) {
 
-	componentDidMount(){
-		this.props.fetchUsers('ALL')
-	}
-
-	mapUsers = () => (
-		this.props.users.map(val=> (
+	useEffect(() => {
+		props.fetchUsers('ALL')
+	}, [])
+	
+	const mapUsers = () => (
+		props.users.map(val=> (
 		<div key={val.userId}>{val.userName}</div>
 		))
 	)
 	
-	render(){
-		return (
-			<div>
-				{this.mapUsers()}
-			</div>
-		)
-	}
+
+	return (
+		<div>
+			{mapUsers()}
+		</div>
+	)
+	
 }
 
 const mapStateToProps = ({user}) => {

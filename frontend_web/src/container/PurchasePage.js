@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import { connect } from "react-redux";
 import { getABook, fetchBooks, bookReducer } from "../store/reducers/book";
 import { Input, Table, Divider, Tag } from "antd";
@@ -7,36 +7,32 @@ import "../css/App.css";
 const { Search } = Input;
 
 
-class PurchasePage extends Component{
+function PurchasePage(props) {
 
-	state={
-		searchValue : ''
+	const [searchValue, setSearchValue] = useState('')
+
+	const searchBookHandler=(value)=>{
+		props.searchBook(value);
+		setSearchValue('');
 	}
 
-	searchBookHandler=(value)=>{
-		this.props.searchBook(value);
-		this.setState({searchValue : ''});
-	}
-
-	mapCart = () => {
+	const mapCart = () => {
 
 	}
 
-	render(){
-		return (
-			<div>
-				<div className="searchInput">
-					<Search 
-						placeholder="Input book Id"
-						value={this.state.searchValue}
-						onChange={(e)=>this.setState({searchValue : e.target.value})}
-						onSearch={value => this.searchBookHandler(value)} 
-						enterButton
-					/>
-				</div>
+	return (
+		<div>
+			<div className="searchInput">
+				<Search 
+					placeholder="Input book Id"
+					value={this.state.searchValue}
+					onChange={(e)=>setSearchValue(e.target.value)}
+					onSearch={value => searchBookHandler(value)} 
+					enterButton
+				/>
 			</div>
-		)
-	}
+		</div>
+	)
 }
 
 const mapStateToProps = ({book}) => {

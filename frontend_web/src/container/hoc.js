@@ -1,25 +1,22 @@
-import React, { Component } from "react";
+import React, { useEffect } from "react";
+import { useHistory } from "react-router-dom";
 import { connect } from "react-redux";
 
 export default function withAuth(NextComponent) {
-	class Authenticate extends Component{
-		componentWillMount(){
-			if(!this.props.isLogin || !this.props.token || !this.props.authKey || !this.props.userId){
-				this.props.history.push('/');
-			}
-		}
+	function Authenticate(props){
 
-		componentWillUpdate(nextProps){
-			if(!nextProps.isLogin || !nextProps.token || !nextProps.authKey || !nextProps.userId){
-				this.props.history.push('/');
-			}
-		}
+		const history = useHistory()
 
-		render(){
-			return (
-				<NextComponent {...this.props} />
-			)
-		}
+		useEffect(()=>{
+			if(!props.isLogin || !props.token || !props.authKey || !props.userId){
+				history.push('/');
+			}
+		}, [props.isLogin, props.token, props.authKey, props.userId, history])
+
+		return (
+			<NextComponent {...props} />
+		)
+		
 	}
 
 	const mapStateToProps = ({auth}) => {
