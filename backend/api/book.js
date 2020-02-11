@@ -2,11 +2,12 @@ const db = require("../db");
 const {getDaysBetweenRange} = require('../libs/helper');
 const {logger} = require('../libs/logger');
 const moment = require('moment');
+const collectionApi = require("./collection");
 
-const createBook = (bookName, price, author = null) => {
+exports.createBook = (bookName, collectionId, price, author = null) => {
 	return new Promise((resolve, reject)=>{
 		let sqlQuery = 'INSERT INTO book SET ?';
-		db.query(sqlQuery, {bookName, price, author}, function(err, rows){
+		db.query(sqlQuery, {bookName, collectionId, price, author}, function(err, rows){
 			if(err) reject({success : false, message : 'systemError'});
 			else if(rows) {
 				resolve({success: true, data: {bookId: rows.insertId, bookName, price, author}});
@@ -15,17 +16,17 @@ const createBook = (bookName, price, author = null) => {
 	})
 }
 
-const createMultipleBooks = (books) => {
+exports.createMultipleBooks = (books) => {
 	return new Promise((resolve, reject) => {
 		Promise.all(
-			books.map(val => createBook(val['bookName'], val['price'], val['author']))
+			books.map(val => this.createBook(val['bookName'], val['collectionId'], val['price'], val['author']))
 		)
 		.then(res => resolve({success: true, data : res}))
 		.catch(err => reject({success : false, message : "Something wrong in the books..."}));
 	})
 }
 
-const searchBookById = (bookId) => {
+exports.searchBookById = (bookId) => {
 	return new Promise((resolve, reject)=>{
 		let sqlQuery = 'SELECT * FROM book where bookId = ? AND active = 1';
 
@@ -37,7 +38,7 @@ const searchBookById = (bookId) => {
 	})
 }
 
-const updateBook = (bookId, data) => {
+exports.updateBook = (bookId, data) => {
 	return new Promise((resolve, reject)=>{
 		let sqlQuery = 'UPDATE book SET ? ';
 		sqlQuery += ` WHERE bookId = ${bookId}`;
@@ -48,7 +49,7 @@ const updateBook = (bookId, data) => {
 	})
 }
 
-const getBooks = () => {
+exports.getBooks = () => {
 	return new Promise((resolve,reject)=>{
 		let sqlQuery = 'SELECT * FROM book';
 		db.query(sqlQuery, {}, function(err, rows){
@@ -58,18 +59,31 @@ const getBooks = () => {
 	})
 }
 
-const createBorrowOrder = (userId, bookId, from, to) =>{
+exports.createBorrowOrder = (userId, bookId, from, to) =>{
 	return new Promise((resolve, reject)=>{
 		let sqlquery = 'INSERT INTO borrow_order SET ?';
 		let duration = getDaysBetweenRange(from, to);
-		db.query(sqlquery, {bookId, userId, from, to,duration }, function(err, rows){
+		db.query(sqlquery, {bookId, userId, from, to,duration }, async (err, rows)=>{
 			if(err) reject({success : false, message: 'systemError'});
-			else if (rows) resolve({success : true, data : {borrowId : rows.insertId}});
+			else if (rows) {
+				try {
+					await this.updateBook(bookId, {borrowed : 1})
+					let borrowedBook = await this.searchBookById(bookId);
+					borrowedBook = borrowedBook.data;
+					let coll = await collectionApi.getColletionById(borrowedBook.collectionId);
+					coll = coll.data;
+					await collectionApi.updateCollectionByID(borrowedBook.collectionId, {inStore : Number(coll.inStore) - 1});
+					resolve({success : true, data : {borrowId : rows.insertId}});
+				} catch (error) {
+					console.log(error)
+					reject({success : false, message : 'Fail to create borrow order'});
+				}
+			}
 		})
 	})
 }
 
-const updateBorrowOrder = (borrowId, data) => {
+exports.updateBorrowOrder = (borrowId, data) => {
 	return new Promise((resolve, reject)=>{
 		let sqlQuery = `UPDATE borrow_order SET ? `;
 		sqlQuery += `WHERE borrowId = ${borrowId}`;
@@ -82,12 +96,12 @@ const updateBorrowOrder = (borrowId, data) => {
 	})
 }
 
-const getAllBorrowOrderByUserId = (userId) => {
+exports.getAllBorrowOrderByUserId = (userId) => {
 	return new Promise((resolve, reject)=>{
 		let sqlQuery = `SELECT borrowId, book.bookId, bookName, userName, borrow_order.from, borrow_order.to, duration, sold, hasReturn, fine FROM `;
 		sqlQuery += '((borrow_order INNER JOIN user on user.userId = borrow_order.userId AND user.userId = ? ) INNER JOIN book on book.bookId = borrow_order.bookId)';
 
-		db.query(sqlQuery, [userId], function(err, rows){
+		db.query(sqlQuery, [userId], (err, rows)=>{
 			if(err) reject({success : false, message: 'systemError'});
 			else if(rows && rows.length>0) {
 				if(rows.find(val => val['hasReturn'] === 0 && moment(val.to).isBefore(moment()))){
@@ -100,7 +114,7 @@ const getAllBorrowOrderByUserId = (userId) => {
 					));
 
 					Promise.all(rows.filter(val=> val.fine && val.fine>0).map((val)=> {
-						return	updateBorrowOrder(val.borrowId, {fine : val['fine']});
+						return this.updateBorrowOrder(val.borrowId, {fine : val['fine']});
 					}))
 					.then(res=>{
 						resolve({success : true, data : rows})
@@ -114,60 +128,65 @@ const getAllBorrowOrderByUserId = (userId) => {
 	})
 }
 
-const returnBook = (borrowId, returnDate, fine) => {
+exports.returnBook = (borrowId, returnDate, fine) => {
 	return new Promise((resolve, reject)=>{
 		let sqlQuery = 'UPDATE borrow_order SET ';
 		sqlQuery += 'hasReturn = 1, ';
 		sqlQuery += 'returnDay = ? ';
 		sqlQuery += 'fine = ? ';
 		sqlQuery += 'WHERE borrowId = ?';
-		db.query(sqlQuery, [returnDate, fine, borrowId], function(err, rows){
+		db.query(sqlQuery, [returnDate, fine, borrowId], (err, rows)=>{
 			if(err) reject({success : false, message : err});
 			else if(rows) {
-				let sqlQuery = 'UPDATE book SET borrowed = 0 WHERE bookId = ?';
-				db.query(sqlQuery, [borrowId], function(err, bookRows){
-					if(err) reject({success : false, message : 'systemError'});
-					else if(bookRows) resolve({success : true, borrowId});
-				})
+				this.updateBook(bookId, {borrowed : 1})
+				.then(res => resolve({success : true, borrowId}))
+				.catch(err => reject({err}))
 			}
 		})
 	})
 }
 
-const purchase = (bookId, orderId) => {
-	return new Promise((resolve, reject)=>{
-		let sqlQuery = `UPDATE book SET orderId = ?, sold = 1 WHERE bookId = ?`;
-		db.query(sqlQuery, [orderId, bookId], function(err, rows){
-			if(err) reject({success: false, message: 'systemError'});
-			else if(rows) {
-				resolve({success : true, data : {bookId, orderId}})
-			}
-		})
+exports.purchase = (bookId, orderId) => {
+	return new Promise(async (resolve, reject)=>{
+		try { 
+			let book = await this.searchBookById(bookId);
+			book = book.data;
+			await this.updateBook(bookId, {orderId, sold : 1})
+			let coll = await collectionApi.getColletionById(book.collectionId);
+			coll = coll.data;
+			await collectionApi.updateCollectionByID(book.collectionId, {inStore : Number(coll.inStore) - 1});
+			resolve({success : true, data : {bookId, orderId}});
+		} catch (error) {
+			console.log(error);
+			reject(error)
+		}
 	})
 }
 
-const purchaseBooks = (items, userId, price) =>{
+exports.purchaseBooks = (items, userId, price) =>{
 	return new Promise((resolve, reject)=>{
 		let sqlQuery = 'INSERT INTO purchase_order SET ';
 		sqlQuery += 'userId = ? , items = ?, price = ?;';
-		db.query(sqlQuery, [userId, items, price], function(err, rows){
+		db.query(sqlQuery, [userId, items, price], async (err, rows)=>{
 			if(err) reject({success:false, message: err});
 			else if(rows) {
 				logger.info('Purchasing book')
-				Promise.all(JSON.parse(items).map(val=>
-					 purchase(val, rows['insertId'])
-				))
-				.then(res=>{
-					resolve({success : true, data : {orderId : rows['insertId'], items, userId} })
-				
-				})
-				.catch(err=>reject(err));
+				try {
+					await Promise.all(JSON.parse(items).map(val=>
+						this.purchase(val, rows['insertId'])
+					));
+	
+					resolve({success : true, data : {orderId : rows['insertId'], items, userId} });
+				} catch (error) {
+					reject({success : false, message : 'Fail to create purchase books'})
+				}
+
 			}
 		})
 	})
 }
 
-const checkBookAvaililty = (books) =>{
+exports.checkBookAvaililty = (books) =>{
 /**
  * @PARAM 'books' is array, then we can check multiple books
  */
@@ -189,17 +208,4 @@ const checkBookAvaililty = (books) =>{
 		return Promise.all(sqlQuery.map(val=> check(val)));
 
 	}
-}
-
-module.exports = {
-	createBook,
-	getBooks,
-	createBorrowOrder,
-	getAllBorrowOrderByUserId,
-	returnBook,
-	searchBookById,
-	updateBook,
-	purchaseBooks,
-	checkBookAvaililty,
-	createMultipleBooks
 }

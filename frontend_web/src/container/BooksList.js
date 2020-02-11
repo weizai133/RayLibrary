@@ -18,7 +18,6 @@ function BookList(props) {
 			{mapBooks()}	
 		</div>
 	)
-	
 
 }
 

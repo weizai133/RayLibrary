@@ -2,18 +2,18 @@ const bookApi = require('../api/book');
 const authRouter = require('./authRouter');
 const {logger} = require('../libs/logger');
 
-authRouter.post('/new', (req, res)=>{
+authRouter.post('/createBook', (req, res)=>{
 	try {
-		if(!req.body.name || !req.body.price) {
+		if(!req.body.name || !req.body.price || !req.body.collectionId) {
 			throw {success : false, message : 'Invalid Input'}
 		}
 
-		bookApi.createBook(req.body.name, req.body.price, req.body.author)
+		bookApi.createBook(req.body.name, req.body.price, req.body.author, req.body.collectionId)
 		.then(result => {
 			res.status(200).json(result);
 		})
 	} catch (error) {
-		logger.logFail(error);
+		// logger.logFail(error);
 		res.status(200).json(error);
 	}
 })
@@ -59,9 +59,19 @@ authRouter.post('/borrow', (req, res)=>{
 		res.status(200).json({success: false, message: 'Not valid input'});
 		return;
 	}
-	bookApi.createBorrowOrder(userId, bookId, from, to)
-	.then(result=>res.status(200).json(result))
-	.catch(err=>res.status(200).json(err));
+
+	bookApi.checkBookAvaililty([bookId])
+	.then(result => {
+		if(result.find(el=> el.data.length === 0)){
+			res.status(200).json({success : false, message : "This book is not availble"});
+			return;
+		}
+
+		bookApi.createBorrowOrder(userId, bookId, from, to)
+		.then(result=>res.status(200).json(result))
+		.catch(err=>res.status(200).json(err));
+	})
+	.catch(err => res.status(200).json({success : false, message : err}))
 })
 
 authRouter.post('/borrow/getBorrowBook/:userId', (req, res)=>{
@@ -102,16 +112,18 @@ authRouter.post('/buyBooks', (req, res)=>{
 			try {
 				const purchaseResult = await bookApi.purchaseBooks(req.body.books, req.body.userId, req.body.price);
 				res.status(200).json({succes: true, orderReady : true, data : purchaseResult});
-				return;
 			} catch (error) {
-				res.status(200).json(err);
-				return;
+				console.log(error)
+				res.status(200).json(error);
 			}
 		}else{
 			res.status(200).json({success: false, orderReady : false, data : result.data})
 		}
 	})
-	.catch(err => res.status(200).json(err));
+	.catch(err => {
+		console.log(err);
+		res.status(200).json(err)
+	});
 })
 
 module.exports = authRouter;
