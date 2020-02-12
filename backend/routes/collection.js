@@ -1,6 +1,12 @@
 const authRouter = require('./authRouter');
 const collectionApi = require('../api/collection');
 
+authRouter.post('/fetchCollections', (req, res)=> {
+	collectionApi.fetchCollections()
+	.then(result => res.status(200).json(result))
+	.catch(err => res.status(200).json(err));
+})
+
 authRouter.post('/createCollection', (req, res)=> {
 	if(!req.body.collectionName || !req.body.price || !req.body.quantity || !req.body.inStore) {
 		res.status(200).json({success : false, message : 'Invalid input'});

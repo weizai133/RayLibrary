@@ -25,7 +25,7 @@ function PurchasePage(props) {
 			<div className="searchInput">
 				<Search 
 					placeholder="Input book Id"
-					value={this.state.searchValue}
+					value={searchValue}
 					onChange={(e)=>setSearchValue(e.target.value)}
 					onSearch={value => searchBookHandler(value)} 
 					enterButton

@@ -86,7 +86,7 @@ authRouter.post('/borrow/getBorrowBook/:userId', (req, res)=>{
 
 authRouter.post('/borrow/returnBook/:borrowId', (req, res)=>{
 	if(!req.params.borrowId || !req.body.returnDate) {
-		res.status(200).json({success: false, message : 'Need borrow book Id or return date'});
+		res.status(200).json({success: false, message : 'Invalid Input'});
 		return;
 	}
 	bookApi.returnBook(req.params.borrowId, req.body.returnDate, req.body.fine)

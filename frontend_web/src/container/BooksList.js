@@ -1,15 +1,15 @@
 import React, { useEffect } from "react";
 import { connect } from "react-redux";
-import { fetchBooks } from "../store/reducers/book";
+import { fetchCollections } from "../store/reducers/collection";
 
 function BookList(props) {
 	useEffect(()=>{
-		props.fetchBooks()
+		props.fetchCollections()
 	}, []);
 
 	function mapBooks(){
-		return props.listOfBooks.map(val=>(
-			<div key={val.bookId}>{val.bookName}</div>
+		return props.listOfCollections.map(val=>(
+			<div key={val.collectionId}>{val.collectionName}</div>
 		))
 	}
 
@@ -21,15 +21,15 @@ function BookList(props) {
 
 }
 
-const mapStateToProps = ({book}) => {
+const mapStateToProps = ({collection}) => {
 	return {
-		listOfBooks : book.books
+		listOfCollections : collection.collections
 	}
 }
 
 const mapDispatchToProps = (dispatch) => {
 	return {
-		fetchBooks : () => dispatch(fetchBooks())
+		fetchCollections : () => dispatch(fetchCollections())
 	}
 }
 

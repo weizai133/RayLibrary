@@ -1,6 +1,17 @@
 const db = require('../db');
 const bookApi = require('./book');
 
+exports.fetchCollections = () => {
+	return new Promise((resolve, reject) => {
+		let sqlQuery = 'SELECT * FROM collections';
+
+		db.query(sqlQuery, [], function(err, rows){
+			if(err) reject({success : false, message : 'Failed to get collections'});
+			else if(rows && rows.length>0) resolve({success : true, data : rows});
+		})
+	})
+}
+
 exports.getColletionById = (collectionId) => {
 	return new Promise((resolve, reject)=>{
 		let sqlQuery = 'SELECT * FROM collections where collectionId = ?';

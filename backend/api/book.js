@@ -83,12 +83,29 @@ exports.createBorrowOrder = (userId, bookId, from, to) =>{
 	})
 }
 
+exports.getBorrowOrderById = (borrowId) => {
+	return new Promise((resolve, reject)=>{
+		let sqlQuery = 'SELECT * FROM borrow_order WHERE borrowId = ?';
+
+		db.query(sqlQuery, [borrowId], function(err, rows){
+			if(err) {
+				console.log(err)
+				reject({success : false, message : 'Fail to get borrowOrder'});
+			}
+			else if(rows && rows.length>0) resolve({success : true, data : rows[0]});
+		})
+	})
+}
+
 exports.updateBorrowOrder = (borrowId, data) => {
 	return new Promise((resolve, reject)=>{
 		let sqlQuery = `UPDATE borrow_order SET ? `;
 		sqlQuery += `WHERE borrowId = ${borrowId}`;
 		db.query(sqlQuery, [data], function(err, rows){
-			if(err) reject({success : false, message : 'systemError'});
+			if(err) {
+				console.log(err)
+				reject({success : false, message : 'systemError'});
+			}
 			else if(rows) {
 				resolve({success : true, data: {borrowId, data} });
 			}
@@ -128,21 +145,31 @@ exports.getAllBorrowOrderByUserId = (userId) => {
 	})
 }
 
-exports.returnBook = (borrowId, returnDate, fine) => {
-	return new Promise((resolve, reject)=>{
-		let sqlQuery = 'UPDATE borrow_order SET ';
-		sqlQuery += 'hasReturn = 1, ';
-		sqlQuery += 'returnDay = ? ';
-		sqlQuery += 'fine = ? ';
-		sqlQuery += 'WHERE borrowId = ?';
-		db.query(sqlQuery, [returnDate, fine, borrowId], (err, rows)=>{
-			if(err) reject({success : false, message : err});
-			else if(rows) {
-				this.updateBook(bookId, {borrowed : 1})
-				.then(res => resolve({success : true, borrowId}))
-				.catch(err => reject({err}))
-			}
-		})
+exports.returnBook = (borrowId, returnDate, fine = null ) => {
+	return new Promise(async (resolve, reject)=>{
+		try {
+		  let borrowOrder = await this.getBorrowOrderById(borrowId);
+			borrowOrder = borrowOrder.data;
+			const bookId = borrowOrder.bookId;
+
+			await this.updateBook(bookId, {borrowed : 1})
+			let book = await this.searchBookById(bookId);
+			book = book.data;
+			//Update book
+			await this.updateBook(bookId, {borrowed : 0});
+			//Update collection
+			let collection = await collectionApi.getColletionById(book.collectionId);
+			collection = collection.data;
+			await collectionApi.updateCollectionByID(book.collectionId, {inStore : Number(collection.inStore) + 1 });
+
+			//Update borrow order
+			await this.updateBorrowOrder(borrowId, {hasReturn : 1, returnDate, fine})
+			resolve({success : true, data : {borrowId, bookId : book.bookId, collectionId : collection.collectionId}});
+
+		} catch (error) {
+			console.log(error)
+			reject({success : false, message : 'Fail to return book'});
+		}
 	})
 }
 

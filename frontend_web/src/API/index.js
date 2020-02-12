@@ -70,3 +70,19 @@ export const generateNewBooksRequest = (books) => {
 		.catch(err => reject(err));
 	})
 }
+
+export const fetchCollectionsRequest = () => {
+	return new Promise((resolve, reject)=> {
+		apiCall('post', '/collection/fetchCollections')
+		.then(res => resolve(res))
+		.catch(err => reject(err));
+	})
+}
+
+export const createCollectionRequest = (newCollection) => {
+	return new Promise((resolve, reject) => {
+		apiCall('post', '/collection/createCollection', newCollection)
+		.then(res => resolve(res))
+		.catch(err => reject(err));
+	})
+}

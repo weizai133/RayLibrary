@@ -2,36 +2,28 @@ import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import { Input, InputNumber, Button, Icon } from "antd";
 import { store } from "../store";
-import { createBooks, setLoading, setCreateBooksStatus } from "../store/reducers/book";
+import { createCollection, collectionReducer } from "../store/reducers/collection";
 
 function NewBook(props){
 
+	const [bookName, setBookName] = useState('');
+	const [quantity, setQuantity] = useState(0);
+	const [price, setPrice] = useState(0);
+	const [inStore, setInStore] = useState();
+	const [author, setAuthor] = useState('');
+
 	useEffect(()=>{
-		if(props.createBooksStatus === 'success'){
+		if(props.status === 'success'){
 			setBookName('');
 			setQuantity(0);
+			setInStore(0);
 			setPrice(0);
 			setAuthor('');
 		}
-	}, [props.createBooksStatus]);
-
-	const [bookName, setBookName] = useState('');
-	const [quantity, setQuantity] = useState(0);
-	const [price, setPrice] = useState();
-	const [author, setAuthor] = useState('');
+	}, [props.status]);
 
 	function createBooksHandler(){
-		
-		store.dispatch(setLoading(true))
-
-		let books = [];
-
-		for(let a=0;a<Number(quantity);a++){
-			books[a]={bookName, price, author};
-		}
-
-		store.dispatch(createBooks(books));
-		store.dispatch(setCreateBooksStatus('loading'))
+		store.dispatch(createCollection({collectionName : bookName, quantity, inStore, author, price }));
 	}
 
 	return (
@@ -40,6 +32,8 @@ function NewBook(props){
 			<Input placeholder="Please input book name" value={bookName} onChange={(e)=>{setBookName(e.target.value)}} />
 			<div>Quantity</div>
 			<Input placeholder="Please input quantity" value={quantity} onChange={(e)=>{setQuantity(e.target.value)}} />
+			<div>In Store</div>
+			<Input placeholder="Please input the quantity in store" value={inStore} onChange={(e)=>{setInStore(e.target.value)}} />
 			<div>Price</div>
 			<Input placeholder="Please input price" value={price} onChange={(e)=>{setPrice(e.target.value)}} />
 			<div>Author</div>
@@ -49,10 +43,10 @@ function NewBook(props){
 	)
 }
 
-const mapStateToProps = ({book}) => {
+const mapStateToProps = ({collection}) => {
 	return {
-		loading : book.loading,
-		createBooksStatus : book.createBooksStatus
+		loading : collection.loading,
+		status : collection.createCollectionStatus
 	}
 }
 
