@@ -1,8 +1,10 @@
+const router = require("express").Router;
 const bookApi = require('../api/book');
-const authRouter = require('./authRouter');
+const router = require('./router');
 const {logger} = require('../libs/logger');
+const {requiredLogin} = require("../libs/jwt")
 
-authRouter.post('/createBook', (req, res)=>{
+router.post('/createBook', requiredLogin, (req, res)=>{
 	try {
 		if(!req.body.name || !req.body.price || !req.body.collectionId) {
 			throw {success : false, message : 'Invalid Input'}
@@ -18,7 +20,7 @@ authRouter.post('/createBook', (req, res)=>{
 	}
 })
 
-authRouter.post('/createMultipleBooks', (req, res)=>{
+router.post('/createMultipleBooks', requiredLogin , (req, res)=>{
 	if(!req.body.books) {
 		res.status(200).json({success : false, message : 'Book(s) is required'});
 		return;
@@ -29,13 +31,13 @@ authRouter.post('/createMultipleBooks', (req, res)=>{
 	.catch(err => res.status(200).json(err))
 })
 
-authRouter.post('/', (req, res)=>{ 
+router.post('/', requiredLogin , (req, res)=>{ 
 	bookApi.getBooks()
 	.then(result => res.status(200).json(result))
 	.catch(err=> res.status(200).json(result));
 })
 
-authRouter.post('/searchBookById/:bookId', (req, res)=>{
+router.post('/searchBookById/:bookId', requiredLogin , (req, res)=>{
 	if(!req.params.bookId) res.status(200).json({success : false, message : 'Need the book id!'});
 	
 	bookApi.searchBookById(req.params.bookId)
@@ -43,7 +45,7 @@ authRouter.post('/searchBookById/:bookId', (req, res)=>{
 	.catch(err => res.status(200).json(err));
 })
 
-authRouter.put('/updateBook/:bookId', (req, res)=>{
+router.put('/updateBook/:bookId', requiredLogin , (req, res)=>{
 	if(!req.params.bookId || !req.body){
 		res.status(200).json({status : 200, message : 'Not valid input'});
 		return;
@@ -53,7 +55,7 @@ authRouter.put('/updateBook/:bookId', (req, res)=>{
 	.catch(err => res.status(200).json(err));
 })
 
-authRouter.post('/borrow', (req, res)=>{
+router.post('/borrow', requiredLogin , (req, res)=>{
 	const {userId, bookId, from, to} = req.body;
 	if(!userId || !bookId || !from || !to){
 		res.status(200).json({success: false, message: 'Not valid input'});
@@ -74,7 +76,7 @@ authRouter.post('/borrow', (req, res)=>{
 	.catch(err => res.status(200).json({success : false, message : err}))
 })
 
-authRouter.post('/borrow/getBorrowBook/:userId', (req, res)=>{
+router.post('/borrow/getBorrowBook/:userId', requiredLogin , (req, res)=>{
 	if(!req.params.userId) {
 		res.status(200).json({success : false, message : 'Need user Id on param'});
 		return;
@@ -84,7 +86,7 @@ authRouter.post('/borrow/getBorrowBook/:userId', (req, res)=>{
 	.catch(err => res.status(200).json(err));
 })
 
-authRouter.post('/borrow/returnBook/:borrowId', (req, res)=>{
+router.post('/borrow/returnBook/:borrowId', requiredLogin , (req, res)=>{
 	if(!req.params.borrowId || !req.body.returnDate) {
 		res.status(200).json({success: false, message : 'Invalid Input'});
 		return;
@@ -94,7 +96,7 @@ authRouter.post('/borrow/returnBook/:borrowId', (req, res)=>{
 	.catch(err=> res.status(200).json(err));
 })
 
-authRouter.post('/buyBooks', (req, res)=>{
+router.post('/buyBooks', requiredLogin , (req, res)=>{
 	if(!req.body.books || !req.body.userId || !req.body.price) {
 		res.status(200).json({success: false, message: 'Invalid input'});
 		return;
@@ -126,4 +128,4 @@ authRouter.post('/buyBooks', (req, res)=>{
 	});
 })
 
-module.exports = authRouter;
+module.exports = router;
