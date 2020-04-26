@@ -1,13 +1,14 @@
-const authRouter = require('./authRouter');
+const router = require("express").Router();
 const collectionApi = require('../api/collection');
+const {requiredLogin} = require('../libs/jwt')
 
-authRouter.post('/fetchCollections', (req, res)=> {
+router.post('/fetchCollections', requiredLogin, (req, res)=> {
 	collectionApi.fetchCollections()
 	.then(result => res.status(200).json(result))
 	.catch(err => res.status(200).json(err));
 })
 
-authRouter.post('/createCollection', (req, res)=> {
+router.post('/createCollection', requiredLogin, (req, res)=> {
 	if(!req.body.collectionName || !req.body.price || !req.body.quantity || !req.body.inStore) {
 		res.status(200).json({success : false, message : 'Invalid input'});
 		return;
@@ -18,7 +19,7 @@ authRouter.post('/createCollection', (req, res)=> {
 	.catch(err => res.status(200).json(err));
 });
 
-authRouter.post('/getCollectionById/:collectionId', (req, res)=> {
+router.post('/getCollectionById/:collectionId', requiredLogin, (req, res)=> {
 	if(!req.params.collectionId) {res.status(200).json({success : false, message : 'Invalid input'}); return;}
 
 	collectionApi.getColletionById(req.params.collectionId)
@@ -26,7 +27,7 @@ authRouter.post('/getCollectionById/:collectionId', (req, res)=> {
 	.catch(err => res.status(200).json(err));
 })
 
-authRouter.put('/updateCollectionQuantityById/:collectionId', (req, res)=> {
+router.put('/updateCollectionQuantityById/:collectionId', requiredLogin, (req, res)=> {
 	if(!req.params.collectionId || !req.body.quantity){
 		res.status(200).json({success : false, message : 'Invalid input'});
 		return;
@@ -37,4 +38,4 @@ authRouter.put('/updateCollectionQuantityById/:collectionId', (req, res)=> {
 	.catch(err => res.status(200).json(err));
 })
 
-module.exports = authRouter;
+module.exports = router;
