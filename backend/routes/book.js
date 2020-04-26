@@ -1,6 +1,5 @@
-const router = require("express").Router;
+const router = require("express").Router();
 const bookApi = require('../api/book');
-const router = require('./router');
 const {logger} = require('../libs/logger');
 const {requiredLogin} = require("../libs/jwt")
 
