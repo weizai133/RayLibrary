@@ -1,6 +1,5 @@
 const router = require("express").Router();
 const bookApi = require('../api/book');
-const {logger} = require('../libs/logger');
 const {requiredLogin} = require("../libs/jwt")
 
 router.post('/createBook', requiredLogin, (req, res)=>{
