@@ -3,6 +3,7 @@ import { store } from "../store";
 import { logOut } from "../store/reducers/auth";
 import { openNotification } from "../helper";
 const BASE_URL = 'http://localhost:3001';
+console.log("here");
 
 export const setHeader = (token, authKey) => {
 	axios.defaults.headers.common['x-access-token'] = token;
