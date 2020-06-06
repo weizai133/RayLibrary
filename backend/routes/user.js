@@ -30,7 +30,7 @@ router.post('/signIn', (req, res)=>{
 		res.status(200).json('Not Valid Input');
 		return;
 	}
-
+	
 	authApi.signIn(req.body.email, req.body.password)
 	.then(result=> res.status(200).json(result))
 	.catch(err => res.status(200).json(err));

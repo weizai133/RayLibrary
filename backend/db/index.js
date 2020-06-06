@@ -1,9 +1,9 @@
-var mysql      = require('mysql');
+var mysql = require('mysql');
 var pool = mysql.createPool({
   host     : 'localhost',
   user     : 'root',
   password : 'root',
-  database : 'library'
+  database : 'ray_library'
 });
  
 const query = (sql, options, callback) =>{

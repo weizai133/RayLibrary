@@ -4,12 +4,16 @@ exports.createJWT = (payload) => {
 	return jwt.sign(payload, process.env.PRI_KEY);
 }
 
-exports.requiredLogin = (token) => {
-	return jwt.verify(token, process.env.PRI_KEY, function(err, decoded){
-		if(decoded && decoded.userId && decoded.email){
-			return decoded;
+exports.requiredLogin = (req, res, next) => {
+	if (!req.header('x-access-token')) res.status(401).json({ success: false, message : "Please log in first" })
+
+	return jwt.verify(req.header('x-access-token'), process.env.PRI_KEY, (err, decoded) => {
+		if(err) next({success : false})
+		else if (decoded && decoded.email && decoded.userId) {
+			next()
+		} else {
+			res.status(500).json({ success : false })
 		}
-		return null;
 	})
 }
 

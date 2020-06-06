@@ -6,12 +6,13 @@ const jwt = require("../libs/jwt");
 const emailExist = (email) => {
 	return new Promise((resolve, reject)=>{
 		let sqlquery = `SELECT userId, email FROM user WHERE email = "${email}"`;
-		db.query(sqlquery, {}, function(err, rows){
+		db.query(sqlquery, {}, (err, rows) => {
 			if(err) {
 				logger.info(err);
 				reject({succss : false, message: 'systemError'});
 			}
 			else if(rows) resolve({success : true, isEmailExisted : rows.length>0})
+			else reject(null)
 		})
 	})
 }
