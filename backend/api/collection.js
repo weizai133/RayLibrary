@@ -6,7 +6,6 @@ exports.fetchCollections = () => {
 		let sqlQuery = 'SELECT * FROM collections';
 
 		db.query(sqlQuery, [], function(err, rows){
-			console.log(rows)
 			if(err) reject({success : false, message : 'Failed to get collections'});
 			else if(rows) resolve({success : true, data : rows})
 		})

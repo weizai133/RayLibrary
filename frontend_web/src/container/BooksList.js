@@ -1,14 +1,17 @@
 import React, { useEffect } from "react";
-import { connect } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { fetchCollections } from "../store/reducers/collection";
 
-function BookList(props) {
+export default function BookList(props) {
+	const dispatch = useDispatch()
+	const listOfCollections = useSelector(state => state.collection.collections)
+
 	useEffect(()=>{
-		props.fetchCollections()
+		dispatch(fetchCollections())
 	}, []);
 
 	function mapBooks(){
-		return props.listOfCollections.map(val=>(
+		return listOfCollections.map(val=>(
 			<div key={val.collectionId}>{val.collectionName}</div>
 		))
 	}
@@ -20,17 +23,3 @@ function BookList(props) {
 	)
 
 }
-
-const mapStateToProps = ({collection}) => {
-	return {
-		listOfCollections : collection.collections
-	}
-}
-
-const mapDispatchToProps = (dispatch) => {
-	return {
-		fetchCollections : () => dispatch(fetchCollections())
-	}
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(BookList)

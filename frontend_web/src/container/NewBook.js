@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { connect } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { Input, InputNumber, Button, Icon } from "antd";
-import { store } from "../store";
-import { createCollection, collectionReducer } from "../store/reducers/collection";
+import { createCollection } from "../store/reducers/collection";
 
-function NewBook(props){
+export default function NewBook(props){
+	const { loading, createCollectionStatus } = useSelector(state  => state.collection)
+	const dispatch = useDispatch()
 
 	const [bookName, setBookName] = useState('');
 	const [quantity, setQuantity] = useState(0);
@@ -13,17 +14,17 @@ function NewBook(props){
 	const [author, setAuthor] = useState('');
 
 	useEffect(()=>{
-		if(props.status === 'success'){
+		if(createCollectionStatus === 'success'){
 			setBookName('');
 			setQuantity(0);
 			setInStore(0);
 			setPrice(0);
 			setAuthor('');
 		}
-	}, [props.status]);
+	}, [createCollectionStatus]);
 
-	function createBooksHandler(){
-		store.dispatch(createCollection({collectionName : bookName, quantity, inStore, author, price }));
+	const createBooksHandler = () => {
+		dispatch( createCollection({collectionName : bookName, quantity, inStore, author, price }) );
 	}
 
 	return (
@@ -38,16 +39,7 @@ function NewBook(props){
 			<Input placeholder="Please input price" value={price} onChange={(e)=>{setPrice(e.target.value)}} />
 			<div>Author</div>
 			<Input placeholder="Please input author" value={author} onChange={(e)=>{setAuthor(e.target.value)}} />
-			<Button onClick={()=>createBooksHandler()} loading={props.loading}>Add</Button>
+			<Button onClick={()=>createBooksHandler()} loading={loading}>Add</Button>
 		</div>
 	)
 }
-
-const mapStateToProps = ({collection}) => {
-	return {
-		loading : collection.loading,
-		status : collection.createCollectionStatus
-	}
-}
-
-export default connect(mapStateToProps)(NewBook);

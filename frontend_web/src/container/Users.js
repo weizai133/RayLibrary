@@ -1,15 +1,17 @@
 import React, {useEffect} from "react";
-import { connect } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { fetchUsers } from "../store/reducers/user";
 
-function Users(props) {
+export default function Users(props) {
+	const dispatch = useDispatch()
+	const users = useSelector(state => state.user.users)
 
 	useEffect(() => {
-		props.fetchUsers('ALL')
+		dispatch(fetchUsers('ALL'))
 	}, [])
 	
 	const mapUsers = () => (
-		props.users.map(val=> (
+		users.map(val=> (
 		<div key={val.userId}>{val.userName}</div>
 		))
 	)
@@ -22,17 +24,3 @@ function Users(props) {
 	)
 	
 }
-
-const mapStateToProps = ({user}) => {
-	return {
-		users : user.users
-	}
-}
-
-const mapDispatchToProps = (dispatch) => {
-	return {
-		fetchUsers : (type)=> dispatch(fetchUsers(type))
-	}
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(Users);
