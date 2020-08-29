@@ -1,10 +1,10 @@
 import React from 'react';
 import { Switch, Route } from "react-router-dom";
-import Home from "./Home";
+import Main from "./Main";
 import LoginPage from "./LoginPage";
 import { initUser } from "../store/reducers/auth";
 import { store } from "../store";
-import withAuth from "./hoc";
+import AuthHOC from "../HOC/AuthHOC";
 import { setHeader } from "../API";
 
 if(window.localStorage.authKey && window.localStorage.token && window.localStorage.userId){
@@ -23,7 +23,7 @@ function App(props) {
     <div>
       <Switch>
        <Route exact path='/' render={(props)=><LoginPage {...props} />} />
-       <Route path='/home' component={withAuth(Home)} />
+       <Route path='/home' component={AuthHOC(Main)} />
      </Switch>
     </div>
   );
