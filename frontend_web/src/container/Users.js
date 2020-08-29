@@ -15,7 +15,6 @@ export default function Users(props) {
 		<div key={val.userId}>{val.userName}</div>
 		))
 	)
-	
 
 	return (
 		<div>
