@@ -33,7 +33,7 @@ export const authError = (payload) => {
 	return {type : AUTH_ERROR, payload};
 }
 
-export const authReducer = (state = initialState, action) => {
+export default (state = initialState, action) => {
 	switch (action.type) {
 		case LOGIN:
 			return {...state, ...action.payload, error : null};

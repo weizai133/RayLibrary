@@ -14,7 +14,7 @@ export const initUsers = (data) => {
 	return {type: INIT_USERS, payload : data}
 }
 
-export const userReducer = (state = initial_state, action) => {
+export default (state = initial_state, action) => {
 	switch (action.type) {
 		case FETCH_USERS:
 			return {...state, fetchUserType : action.payload};

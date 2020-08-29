@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Input, InputNumber, Button, Icon } from "antd";
+import { Input, Button } from "antd";
 import { createCollection } from "../store/reducers/collection";
 
 export default function NewBook(props){
