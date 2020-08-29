@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import { Link, useRouteMatch, useHistory } from "react-router-dom";
-import { store } from "../store";
+import store from "../store";
 import { logOut } from "../store/reducers/auth";
 import { Layout, Menu, Icon } from 'antd';
 

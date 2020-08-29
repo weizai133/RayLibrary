@@ -1,5 +1,5 @@
 import axios from "axios";
-import { store } from "../store";
+import store from "../store";
 import { logOut } from "../store/reducers/auth";
 import { openNotification } from "../helper";
 const BASE_URL = 'http://localhost:3001';

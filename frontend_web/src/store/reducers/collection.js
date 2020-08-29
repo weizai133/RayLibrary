@@ -38,7 +38,7 @@ const initialState = {
 	createCollectionStatus : null
 }
 
-export const collectionReducer = (state = initialState, action) => {
+export default (state = initialState, action) => {
 	switch (action.type) {
 		case FETCH_COLLECTIONS:
 			return {...state};
@@ -52,7 +52,7 @@ export const collectionReducer = (state = initialState, action) => {
 			return {...state, newCollection : action.payload}
 		}
 		case INIT_NEW_COLLECTION : {
-			return {...state, collections : [...state.collections, action.payload]}
+			return {...state, collections : [...state.collection, action.payload]}
 		}
 		case SET_CREATE_COLLECTION_STATUS : {
 			return {...state, createCollectionStatus : action.payload}

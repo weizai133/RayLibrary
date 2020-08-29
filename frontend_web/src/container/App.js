@@ -3,7 +3,7 @@ import { Switch, Route } from "react-router-dom";
 import Main from "./Main";
 import LoginPage from "./LoginPage";
 import { initUser } from "../store/reducers/auth";
-import { store } from "../store";
+import store from "../store";
 import AuthHOC from "../HOC/AuthHOC";
 import { setHeader } from "../API";
 

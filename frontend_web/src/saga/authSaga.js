@@ -14,7 +14,7 @@ export function* login(){
 				window.localStorage.setItem(val, res.data.data[val])
 			});
 			setHeader(res.data.data.token, res.data.data.authKey);
-			openNotification('success', "Login Success", `Welcome back to RayLid`)
+			openNotification('success', "Login Success", `Welcome back to RayLib`)
 			yield put(initUser(res.data));
 		}else {
 			openNotification('error', "Login Error", res.data.message)
