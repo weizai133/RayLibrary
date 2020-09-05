@@ -3,10 +3,11 @@ const cors = require('cors');
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
+
 const bookRoute = require('./routes/book');
 const userRoute = require('./routes/user');
 const collectionRoute = require('./routes/collection')
-const {logger} = require('./libs/logger');
+const { logger } = require('./libs/logger');
 
 app.use(cors());
 app.options('*', cors());

@@ -17,11 +17,11 @@ const emailExist = (email) => {
 	})
 }
 
-const updateTokenAndAuthorisation = (payload) => {
+const updateTokenAndAuthorisation = async (payload) => {
 	/**
 	 * @PARAM "payload" must contain userId
 	 */
-	let token = jwt.createJWT(payload);
+	let token = await jwt.createJWTAndSave(payload);
 	let authKey = jwt.createJWT({userId : payload.userId})
 	return new Promise((resolve, reject)=>{
 		let sqlquery = 'UPDATE user SET ';

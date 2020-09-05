@@ -1,6 +1,7 @@
 import React, { lazy, Suspense } from "react";
 import { Switch, Route, useRouteMatch } from "react-router-dom";
 import store from "../store";
+import Loader from "../Component/Loader";
 
 export default () => {
   const { path } = useRouteMatch()
@@ -24,7 +25,7 @@ export default () => {
     })
     return (
       <div>
-        <Suspense fallback={<div>loading</div>}>
+        <Suspense fallback={<></>}>
           <RenderComponent />
         </Suspense>
       </div>
