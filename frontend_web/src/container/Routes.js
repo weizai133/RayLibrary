@@ -37,7 +37,7 @@ export default () => {
       <Route exact path={`${path}`} render={()=> AsyncComponent('BooksList', ['collection'])} />
       <Route path={`${path}/newBook`} render={()=> AsyncComponent('NewBook', ['book', 'collection'])} />
       <Route path={`${path}/user`} render={()=> AsyncComponent('Users', ['user'])}/>
-      <Route path={`${path}/purchase`} render={()=> AsyncComponent('PurchasePage')} />
+      <Route path={`${path}/purchase`} render={()=> AsyncComponent('PurchasePage', ['book', 'collection'])} />
     </Switch>
   )
 }
