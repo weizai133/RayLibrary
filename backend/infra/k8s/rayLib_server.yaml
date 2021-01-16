@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: raylib-server
+spec:
+  containers:
+    - name: raylib-server
+      image: raylib:0.3

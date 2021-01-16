@@ -61,7 +61,7 @@ exports.getBooks = () => {
 
 exports.createBorrowOrder = (userId, bookId, from, to) =>{
 	return new Promise((resolve, reject)=>{
-		let sqlquery = 'INSERT INTO borrow_order SET ?';
+		let sqlquery = 'INSERT INTO order SET ?';
 		let duration = getDaysBetweenRange(from, to);
 		db.query(sqlquery, {bookId, userId, from, to,duration }, async (err, rows)=>{
 			if(err) reject({success : false, message: 'systemError'});
@@ -85,7 +85,7 @@ exports.createBorrowOrder = (userId, bookId, from, to) =>{
 
 exports.getBorrowOrderById = (borrowId) => {
 	return new Promise((resolve, reject)=>{
-		let sqlQuery = 'SELECT * FROM borrow_order WHERE borrowId = ?';
+		let sqlQuery = 'SELECT * FROM order WHERE borrowId = ?';
 
 		db.query(sqlQuery, [borrowId], function(err, rows){
 			if(err) {
@@ -99,7 +99,7 @@ exports.getBorrowOrderById = (borrowId) => {
 
 exports.updateBorrowOrder = (borrowId, data) => {
 	return new Promise((resolve, reject)=>{
-		let sqlQuery = `UPDATE borrow_order SET ? `;
+		let sqlQuery = `UPDATE order SET ? `;
 		sqlQuery += `WHERE borrowId = ${borrowId}`;
 		db.query(sqlQuery, [data], function(err, rows){
 			if(err) {
@@ -115,8 +115,8 @@ exports.updateBorrowOrder = (borrowId, data) => {
 
 exports.getAllBorrowOrderByUserId = (userId) => {
 	return new Promise((resolve, reject)=>{
-		let sqlQuery = `SELECT borrowId, book.bookId, bookName, userName, borrow_order.from, borrow_order.to, duration, sold, hasReturn, fine FROM `;
-		sqlQuery += '((borrow_order INNER JOIN user on user.userId = borrow_order.userId AND user.userId = ? ) INNER JOIN book on book.bookId = borrow_order.bookId)';
+		let sqlQuery = `SELECT borrowId, book.bookId, bookName, userName, order.from, order.to, duration, sold, hasReturn, fine FROM `;
+		sqlQuery += '((order INNER JOIN user on user.userId = order.userId AND user.userId = ? ) INNER JOIN book on book.bookId = order.bookId)';
 
 		db.query(sqlQuery, [userId], (err, rows)=>{
 			if(err) reject({success : false, message: 'systemError'});

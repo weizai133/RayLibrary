@@ -3,7 +3,8 @@ const { promisify } = require("util");
 
 const redis_client = redis.createClient({ host: '127.0.0.1', port: '6379' });
 redis_client.on("error", (error) => {
-	logger.error(error)
+  // logger.error(error)
+  if (error) console.log(error)
 });
 
 const redisSet = promisify(redis_client.set).bind(redis_client);
